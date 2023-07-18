@@ -1,35 +1,23 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+""" Log stats """
+from pymongo import MongoClient
 
-import logging
-import sys
 
-from logstash_async.handler import AsynchronousLogstashHandler
+if __name__ == "__main__":
+    client = MongoClient('mongodb://127.0.0.1:27017')
+    db_nginx = client.logs.nginx
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
-host = 'localhost'
-port = 5959
+    count_logs = db_nginx.count_documents({})
+    print(f'{count_logs} logs')
 
-test_logger = logging.getLogger('python-logstash-logger')
-test_logger = logging.getLogger('')
-test_logger.setLevel(logging.INFO)
-test_logger.addHandler(AsynchronousLogstashHandler(host, port, database_path='logstash_test.db'))
+    print('Methods:')
+    for method in methods:
+        count_method = db_nginx.count_documents({'method': method})
+        print(f'\tmethod {method}: {count_method}')
 
-test_logger.error('python-logstash-async: test logstash error message.')
-test_logger.info('python-logstash-async: test logstash info message.')
-test_logger.warning('python-logstash-async: test logstash warning message.')
-test_logger.debug('python-logstash-async: test logstash debug message.')
+    check = db_nginx.count_documents(
+        {"method": "GET", "path": "/status"}
+    )
 
-try:
-    1 / 0
-except Exception as e:
-    test_logger.exception(u'Exception: %s', e)
-
-# add extra field to logstash message
-extra = {
-    'test_string': 'python version: ' + repr(sys.version_info),
-    'test_boolean': True,
-    'test_dict': {'a': 1, 'b': 'c'},
-    'test_float': 1.23,
-    'test_integer': 123,
-    'test_list': [1, 2, '3'],
-}
-test_logger.info('python-logstash: test extra fields', extra=extra)
+    print(f'{check} status check')
