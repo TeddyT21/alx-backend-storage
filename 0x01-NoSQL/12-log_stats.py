@@ -1,27 +1,23 @@
 #!/usr/bin/env python3
-"""Log stats module"""
+""" Log stats """
 from pymongo import MongoClient
 
 
 if __name__ == "__main__":
     client = MongoClient('mongodb://127.0.0.1:27017')
-    db = client.logs.nginx
+    db_nginx = client.logs.nginx
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
-    num_logs = db.count_documents({})
-    print(f"{num_logs} logs")
+    count_logs = db_nginx.count_documents({})
+    print(f'{count_logs} logs')
 
-    get = db.count_documents({'method': 'GET'})
-    post = db.count_documents({'method': 'POST'})
-    put = db.count_documents({'method': 'PUT'})
-    patch = db.count_documents({'method': 'PATCH'})
-    delete = db.count_documents({'method': 'DELETE'})
+    print('Methods:')
+    for method in methods:
+        count_method = db_nginx.count_documents({'method': method})
+        print(f'\tmethod {method}: {count_method}')
 
-    print("Methods:")
-    print(f"\tmethod GET: {get}")
-    print(f"\tmethod POST: {post}")
-    print(f"\tmethod PUT: {put}")
-    print(f"\tmethod PATCH: {patch}")
-    print(f"\tmethod DELETE: {delete}")
+    check = db_nginx.count_documents(
+        {"method": "GET", "path": "/status"}
+    )
 
-    status = db.count_documents({'method': 'GET', 'path': '/status'})
-    print(f"{status} status check")
+    print(f'{check} status check')
