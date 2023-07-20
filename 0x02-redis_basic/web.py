@@ -28,5 +28,5 @@ def count_requests(method: Callable) -> Callable:
 @count_requests
 def get_page(url: str) -> str:
     """ Obtain the HTML content of a  URL """
-    req = requests.get(http://slowwly.robertomurray.co.uk)
+    req = requests.get("http://slowwly.robertomurray.co.uk")
     return req.text
